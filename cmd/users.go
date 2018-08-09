@@ -16,15 +16,17 @@ const (
 // usersmd represents the user command
 var usersCmd = &cobra.Command{
 	Use:   "users",
-	Short: "Get user(s) information",
+	Short: "Work with REX users",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		client := rex.NewClient(ClientID, ClientSecret, nil)
+		client, err := rex.NewClient(ClientID, ClientSecret, nil)
+		if err != nil {
+			panic(err)
+		}
 
 		if c, _ := cmd.Flags().GetBool(paramCurrentUser); c == true {
 
-			user, err := rex.GetCurrentUser(client)
-			console(err, user)
+			console(err, client.User)
 
 		} else if c, _ := cmd.Flags().GetBool(paramCount); c == true {
 			count, err := rex.GetTotalNumberOfUsers(client)
@@ -39,14 +41,6 @@ var usersCmd = &cobra.Command{
 			fmt.Println("Flag required")
 		}
 	},
-}
-
-func console(err error, value interface{}) {
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Printf("\n%v\n", value)
-	}
 }
 
 func init() {
