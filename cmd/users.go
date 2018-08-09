@@ -15,8 +15,16 @@ const (
 
 // usersmd represents the user command
 var usersCmd = &cobra.Command{
-	Use:   "users",
+	Use:   "user",
 	Short: "Work with REX users",
+	Long: `
+--------------------------------------------------------------
+                          rx - (c) 2018
+--------------------------------------------------------------
+
+REX user is the identity management console.
+
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		client, err := rex.NewClient(ClientID, ClientSecret, nil)
@@ -38,7 +46,7 @@ var usersCmd = &cobra.Command{
 			console(err, user)
 
 		} else {
-			fmt.Println("Flag required")
+			cmd.Help()
 		}
 	},
 }

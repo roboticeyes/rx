@@ -27,18 +27,14 @@ var rootCmd = &cobra.Command{
                           rx - (c) 2018
 --------------------------------------------------------------
 
-The rx tool can be used to talk to various REX cloud APIs and
-get information such as:
+rx is a command line tool for accessing the REX cloud API.
+For further information please see our support page:
 
-- Projects
-- References
-- User information
+                https://support.robotic-eyes.com
 
-For further information please see our support page: https://support.robotic-eyes.com.
 `}
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
+// Execute the main command
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
@@ -77,7 +73,6 @@ func initConfig() {
 	viper.AutomaticEnv() // read in environment variables that match
 
 	if err := viper.ReadInConfig(); err == nil {
-		//fmt.Println("Using config file:", viper.ConfigFileUsed())
 	} else {
 		panic(err)
 	}
