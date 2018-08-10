@@ -15,6 +15,7 @@ const (
 	paramName      = "name"
 	paramProjectID = "id"
 	paramLocalFile = "file"
+	paramDownload  = "dl"
 )
 
 var projectsCmd = &cobra.Command{
@@ -40,6 +41,23 @@ var listCmd = &cobra.Command{
 		client, err := rex.NewClient(ClientID, ClientSecret, nil)
 		project, err := rex.GetProjects(client)
 		console(err, project)
+	},
+}
+
+var showCmd = &cobra.Command{
+	Use:   "show",
+	Short: "Show the details of a project",
+	Run: func(cmd *cobra.Command, args []string) {
+		client, err := rex.NewClient(ClientID, ClientSecret, nil)
+
+		projectID, _ := cmd.Flags().GetString(paramProjectID)
+		project, err := rex.GetProject(client, projectID)
+
+		if c, _ := cmd.Flags().GetInt(paramDownload); c != -1 {
+			rex.DownloadFile(client, project.Embedded.ProjectFiles[c].Links.FileDownload.Href)
+		} else {
+			console(err, project)
+		}
 	},
 }
 
@@ -78,7 +96,7 @@ var uploadFileCmd = &cobra.Command{
 
 		r, _ := os.Open(localFile)
 		defer r.Close()
-		err = rex.UploadProjectFiles(client, projectID, name, localFile, r)
+		err = rex.UploadProjectFile(client, projectID, name, localFile, r)
 		console(err, "Success!")
 	},
 }
@@ -88,6 +106,7 @@ func init() {
 	projectsCmd.AddCommand(listCmd)
 	projectsCmd.AddCommand(newCmd)
 	projectsCmd.AddCommand(uploadFileCmd)
+	projectsCmd.AddCommand(showCmd)
 
 	newCmd.Flags().StringP(paramName, "", "", "Name of the project")
 
@@ -97,4 +116,9 @@ func init() {
 
 	uploadFileCmd.MarkFlagRequired(paramProjectID)
 	uploadFileCmd.MarkFlagRequired(paramLocalFile)
+
+	showCmd.Flags().StringP(paramProjectID, "", "", "ProjectID [mandatory]")
+	showCmd.Flags().Int(paramDownload, -1, "Download the given project file ID")
+	showCmd.MarkFlagRequired(paramProjectID)
+
 }
