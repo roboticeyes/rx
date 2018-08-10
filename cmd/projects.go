@@ -93,7 +93,7 @@ var newCmd = &cobra.Command{
 
 		if files := getFileEntries(fileList); len(files) > 0 {
 			for _, f := range files {
-				fmt.Print("Creating project ", f, " ...")
+				fmt.Print("Creating project ", f, " ... ")
 				err = rex.CreateProject(client, f)
 				console(err, "Success!")
 			}
@@ -130,7 +130,7 @@ var uploadFileCmd = &cobra.Command{
 		// Bulk upload
 		if files := getFileEntries(fileList); len(files) > 0 {
 			for _, f := range files {
-				fmt.Print("Uploading file ", f, " ...")
+				fmt.Print("Uploading file ", f, " ... ")
 				r, _ := os.Open(f)
 				defer r.Close()
 				err = rex.UploadProjectFile(client, projectID, filepath.Base(f), f, r)

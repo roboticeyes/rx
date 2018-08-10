@@ -74,7 +74,7 @@ func initConfig() {
 
 	if err := viper.ReadInConfig(); err == nil {
 	} else {
-		panic(err)
+		return
 	}
 	ClientID = viper.GetString("ClientID")
 	ClientSecret = viper.GetString("ClientSecret")
