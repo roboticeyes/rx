@@ -3,6 +3,7 @@ package cmd
 import (
 	"bufio"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -16,6 +17,7 @@ const (
 	paramProjectID = "id"
 	paramLocalFile = "file"
 	paramDownload  = "dl"
+	paramFile      = "file"
 )
 
 var projectsCmd = &cobra.Command{
@@ -67,17 +69,28 @@ var newCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := rex.NewClient(ClientID, ClientSecret, nil)
 		name, _ := cmd.Flags().GetString(paramName)
+		fileList, _ := cmd.Flags().GetString(paramFile)
 
-		if name == "" {
+		if fileList != "" {
+			content, _ := ioutil.ReadFile(fileList)
+			files := strings.Split(string(content), "\n")
+			for _, f := range files {
+				if f != "" {
+					fmt.Print("Creating project ", f, " ...")
+					err = rex.CreateProject(client, f)
+					console(err, "Success!")
+				}
+			}
+		} else if name == "" {
 			reader := bufio.NewReader(os.Stdin)
 			fmt.Print("Project name: ")
 			name, _ = reader.ReadString('\n')
 			name = strings.Replace(name, "\n", "", -1)
+		} else {
+			fmt.Println("Creating new project: ", name)
+			err = rex.CreateProject(client, name)
+			console(err, "Success!")
 		}
-
-		fmt.Println("Creating new project: ", name)
-		err = rex.CreateProject(client, name)
-		console(err, "Success!")
 	},
 }
 
@@ -109,6 +122,7 @@ func init() {
 	projectsCmd.AddCommand(showCmd)
 
 	newCmd.Flags().StringP(paramName, "", "", "Name of the project")
+	newCmd.Flags().StringP(paramFile, "", "", "File containing a list of project names")
 
 	uploadFileCmd.Flags().StringP(paramProjectID, "", "", "ProjectID [mandatory]")
 	uploadFileCmd.Flags().StringP(paramLocalFile, "", "", "Full path of local file [mandatory]")
@@ -120,5 +134,4 @@ func init() {
 	showCmd.Flags().StringP(paramProjectID, "", "", "ProjectID [mandatory]")
 	showCmd.Flags().Int(paramDownload, -1, "Download the given project file ID")
 	showCmd.MarkFlagRequired(paramProjectID)
-
 }
