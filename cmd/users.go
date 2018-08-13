@@ -1,3 +1,8 @@
+/*
+ * Author: Bernhard Reitinger
+ * Date  : 2018
+ */
+
 package cmd
 
 import (
@@ -27,7 +32,7 @@ REX user is the identity management console.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		client, err := rex.NewClient(ClientID, ClientSecret, nil)
+		client, err := rex.NewClient(RxConfig.ClientID, RxConfig.ClientSecret, nil)
 		if err != nil {
 			panic(err)
 		}

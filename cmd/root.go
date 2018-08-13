@@ -1,3 +1,8 @@
+/*
+ * Author: Bernhard Reitinger
+ * Date  : 2018
+ */
+
 package cmd
 
 import (
@@ -12,11 +17,19 @@ import (
 
 var cfgFile string
 
-// ClientID is the secret ID for authentication
-var ClientID string
+// RxConfig stores the values from the configuration file
+var RxConfig = struct {
 
-// ClientSecret is the secret password for authentication
-var ClientSecret string
+	// ClientID is the secret ID for authentication
+	ClientID string
+
+	// ClientSecret is the secret password for authentication
+	ClientSecret string
+
+	// This is the token which is temporarily stored in the config file
+	// if it is expired then the client needs to re-authorize
+	ClientToken string
+}{}
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -45,11 +58,11 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.rexcli.yml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.rx.yml)")
 
 	rootCmd.PersistentFlags().StringVar(&rex.RexBaseURL, "BaseURL", "https://rex.robotic-eyes.com", "REX cloud base URL")
-	rootCmd.PersistentFlags().StringVar(&ClientID, "ClientID", "", "client id for the user")
-	rootCmd.PersistentFlags().StringVar(&ClientSecret, "ClientSecret", "", "client secret for the user")
+	rootCmd.PersistentFlags().StringVar(&RxConfig.ClientID, "ClientID", "", "client id for the user")
+	rootCmd.PersistentFlags().StringVar(&RxConfig.ClientSecret, "ClientSecret", "", "client secret for the user")
 
 	viper.BindPFlag("ClientID", rootCmd.PersistentFlags().Lookup("ClientID"))
 	viper.BindPFlag("ClientSecret", rootCmd.PersistentFlags().Lookup("ClientSecret"))
@@ -67,7 +80,7 @@ func initConfig() {
 		}
 
 		viper.AddConfigPath(home)
-		viper.SetConfigName(".rexcli")
+		viper.SetConfigName(".rx")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
@@ -76,7 +89,8 @@ func initConfig() {
 	} else {
 		return
 	}
-	ClientID = viper.GetString("ClientID")
-	ClientSecret = viper.GetString("ClientSecret")
+	RxConfig.ClientID = viper.GetString("ClientID")
+	RxConfig.ClientSecret = viper.GetString("ClientSecret")
+	RxConfig.ClientToken = viper.GetString("AuthToken")
 	rex.RexBaseURL = viper.GetString("BaseURL")
 }

@@ -1,3 +1,8 @@
+/*
+ * Author: Bernhard Reitinger
+ * Date  : 2018
+ */
+
 package cmd
 
 import (
@@ -41,7 +46,7 @@ var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List your projects",
 	Run: func(cmd *cobra.Command, args []string) {
-		client, err := rex.NewClient(ClientID, ClientSecret, nil)
+		client, err := rex.NewClient(RxConfig.ClientID, RxConfig.ClientSecret, nil)
 		project, err := rex.GetProjects(client)
 		console(err, project)
 	},
@@ -51,7 +56,7 @@ var showCmd = &cobra.Command{
 	Use:   "show",
 	Short: "Show the details of a project",
 	Run: func(cmd *cobra.Command, args []string) {
-		client, err := rex.NewClient(ClientID, ClientSecret, nil)
+		client, err := rex.NewClient(RxConfig.ClientID, RxConfig.ClientSecret, nil)
 
 		projectID, _ := cmd.Flags().GetString(paramProjectID)
 		project, err := rex.GetProject(client, projectID)
@@ -87,7 +92,7 @@ var newCmd = &cobra.Command{
 	Use:   "new",
 	Short: "Create a new project",
 	Run: func(cmd *cobra.Command, args []string) {
-		client, err := rex.NewClient(ClientID, ClientSecret, nil)
+		client, err := rex.NewClient(RxConfig.ClientID, RxConfig.ClientSecret, nil)
 		name, _ := cmd.Flags().GetString(paramName)
 		fileList, _ := cmd.Flags().GetString(paramFile)
 
@@ -117,7 +122,7 @@ var uploadFileCmd = &cobra.Command{
 	Use:   "upload",
 	Short: "Uploads a new file for a given project",
 	Run: func(cmd *cobra.Command, args []string) {
-		client, err := rex.NewClient(ClientID, ClientSecret, nil)
+		client, err := rex.NewClient(RxConfig.ClientID, RxConfig.ClientSecret, nil)
 		projectID, _ := cmd.Flags().GetString(paramProjectID)
 		localFile, _ := cmd.Flags().GetString(paramLocalFile)
 		name := filepath.Base(localFile)
