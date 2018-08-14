@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/breiting/rex"
@@ -24,6 +25,9 @@ const (
 	paramDownload  = "dl"
 	paramFile      = "file"
 	paramFileList  = "bulk"
+
+	openStreetMap       = "https://www.openstreetmap.org"
+	openStreetMapSearch = "https://nominatim.openstreetmap.org/search"
 )
 
 var projectsCmd = &cobra.Command{
@@ -95,20 +99,14 @@ var newCmd = &cobra.Command{
 		if files := getFileEntries(fileList); len(files) > 0 {
 			for _, f := range files {
 				fmt.Print("Creating project ", f, " ... ")
-				err := rex.CreateProject(RxConfig.AuthClient, f)
+				err := rex.CreateProject(RxConfig.AuthClient, f, nil, nil)
 				console(err, "Success!")
 			}
 		} else if name == "" {
-			reader := bufio.NewReader(os.Stdin)
-			fmt.Print("Project name: ")
-			name, _ = reader.ReadString('\n')
-			name = strings.Replace(name, "\n", "", -1)
-			fmt.Print("Creating new project: ", name)
-			err := rex.CreateProject(RxConfig.AuthClient, name)
-			console(err, "Success!")
+			createProjectInteractive()
 		} else {
 			fmt.Print("Creating new project: ", name)
-			err := rex.CreateProject(RxConfig.AuthClient, name)
+			err := rex.CreateProject(RxConfig.AuthClient, name, nil, nil)
 			console(err, "Success!")
 		}
 	},
@@ -165,4 +163,70 @@ func init() {
 	showCmd.Flags().StringP(paramProjectID, "", "", "ProjectID [mandatory]")
 	showCmd.Flags().Int(paramDownload, -1, "Download the given project file ID")
 	showCmd.MarkFlagRequired(paramProjectID)
+}
+
+func getInput(name string, r *bufio.Reader) string {
+
+	fmt.Printf("%-20s: ", name)
+	name, _ = r.ReadString('\n')
+	return strings.Replace(name, "\n", "", -1)
+}
+
+func interpretFloatInput(input string, val float64) float64 {
+	if input != "" {
+		l, err := strconv.ParseFloat(input, 64)
+		if err != nil {
+			return 0.0
+		}
+		return l
+	}
+	return val
+}
+
+func createProjectInteractive() {
+	r := bufio.NewReader(os.Stdin)
+
+	name := getInput("Name", r)
+
+	var address rex.ProjectAddress
+	var absoluteTransformation rex.ProjectTransformation
+
+	address.AddressLine1 = getInput("AddressLine1", r)
+	address.AddressLine2 = getInput("AddressLine2", r)
+	address.AddressLine3 = getInput("AddressLine3", r)
+	address.AddressLine4 = getInput("AddressLine4", r)
+	address.PostCode = getInput("Postcode", r)
+	address.City = getInput("City", r)
+	address.Region = getInput("Region", r)
+	address.Country = getInput("Country", r)
+
+	lat, lon := GetGeoLocation(&address)
+	absoluteTransformation.Position.Coordinates = make([]float64, 3)
+
+	latInput := getInput(fmt.Sprintf("Lat [%f]", lat), r)
+	absoluteTransformation.Position.Coordinates[1] = interpretFloatInput(latInput, lat)
+
+	lonInput := getInput(fmt.Sprintf("Lon [%f]", lon), r)
+	absoluteTransformation.Position.Coordinates[0] = interpretFloatInput(lonInput, lon)
+
+	heightInput := getInput("Height [m]", r)
+	absoluteTransformation.Position.Coordinates[2] = interpretFloatInput(heightInput, 0.0)
+
+	absoluteTransformation.Rotation.X = 0.0
+	absoluteTransformation.Rotation.Y = 0.0
+
+	northingInput := getInput("Northing (0=north, 90=east)", r)
+	absoluteTransformation.Rotation.Z = interpretFloatInput(northingInput, 0.0)
+
+	fmt.Printf("\n\nProject %s ", name)
+	err := rex.CreateProject(RxConfig.AuthClient, name, &address, &absoluteTransformation)
+	console(err, "added successfully!")
+
+	mapLink := openStreetMap
+	mapLink += fmt.Sprintf("?mlat=%f", absoluteTransformation.Position.Coordinates[1])
+	mapLink += fmt.Sprintf("&mlon=%f", absoluteTransformation.Position.Coordinates[0])
+	mapLink += fmt.Sprintf("#map=17/%f", absoluteTransformation.Position.Coordinates[1])
+	mapLink += fmt.Sprintf("/%f", absoluteTransformation.Position.Coordinates[0])
+	mapLink += fmt.Sprintf("&layers=N")
+	fmt.Printf("\n\nMap link: %s\n\n", mapLink)
 }
