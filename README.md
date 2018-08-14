@@ -1,4 +1,5 @@
 # rx - CLI for REX
+[![Build Status](https://travis-ci.org/breiting/rx.svg?branch=master)](https://travis-ci.org/breiting/rx)
 
 **rx** is a command line tool for accessing the REX cloud API. rx is using the [rex](https://github.com/breiting/rex) GO library.
 
