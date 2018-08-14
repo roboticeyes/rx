@@ -20,7 +20,7 @@ const (
 
 // usersmd represents the user command
 var usersCmd = &cobra.Command{
-	Use:   "user",
+	Use:   "users",
 	Short: "Work with REX users",
 	Long: `
 --------------------------------------------------------------
@@ -32,22 +32,17 @@ REX user is the identity management console.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		client, err := rex.NewClient(RxConfig.ClientID, RxConfig.ClientSecret, nil)
-		if err != nil {
-			panic(err)
-		}
-
 		if c, _ := cmd.Flags().GetBool(paramCurrentUser); c == true {
 
-			console(err, client.User)
+			console(nil, RxConfig.AuthClient.User)
 
 		} else if c, _ := cmd.Flags().GetBool(paramCount); c == true {
-			count, err := rex.GetTotalNumberOfUsers(client)
+			count, err := rex.GetTotalNumberOfUsers(RxConfig.AuthClient)
 			console(err, fmt.Sprintf("Found %d registered users.\n", count))
 
 		} else if email, _ := cmd.Flags().GetString(paramFindUser); email != "" {
 
-			user, err := rex.GetUserByEmail(client, email)
+			user, err := rex.GetUserByEmail(RxConfig.AuthClient, email)
 			console(err, user)
 
 		} else {

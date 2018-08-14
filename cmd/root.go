@@ -7,6 +7,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/breiting/rex"
@@ -29,6 +30,9 @@ var RxConfig = struct {
 	// This is the token which is temporarily stored in the config file
 	// if it is expired then the client needs to re-authorize
 	ClientToken string
+
+	// The authenticated client for all REX operations
+	AuthClient *rex.Client
 }{}
 
 // rootCmd represents the base command when called without any subcommands
@@ -93,4 +97,11 @@ func initConfig() {
 	RxConfig.ClientSecret = viper.GetString("ClientSecret")
 	RxConfig.ClientToken = viper.GetString("AuthToken")
 	rex.RexBaseURL = viper.GetString("BaseURL")
+
+	// Authenticate user
+	var err error
+	RxConfig.AuthClient, err = rex.NewClient(RxConfig.ClientID, RxConfig.ClientSecret, nil)
+	if err != nil {
+		log.Fatal("Cannot get authentication token, please check your client credentials")
+	}
 }

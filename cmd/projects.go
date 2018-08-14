@@ -27,7 +27,7 @@ const (
 )
 
 var projectsCmd = &cobra.Command{
-	Use:   "project",
+	Use:   "projects",
 	Short: "Work with REX projects",
 	Long: `
 --------------------------------------------------------------
@@ -46,8 +46,7 @@ var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List your projects",
 	Run: func(cmd *cobra.Command, args []string) {
-		client, err := rex.NewClient(RxConfig.ClientID, RxConfig.ClientSecret, nil)
-		project, err := rex.GetProjects(client)
+		project, err := rex.GetProjects(RxConfig.AuthClient)
 		console(err, project)
 	},
 }
@@ -56,13 +55,11 @@ var showCmd = &cobra.Command{
 	Use:   "show",
 	Short: "Show the details of a project",
 	Run: func(cmd *cobra.Command, args []string) {
-		client, err := rex.NewClient(RxConfig.ClientID, RxConfig.ClientSecret, nil)
-
 		projectID, _ := cmd.Flags().GetString(paramProjectID)
-		project, err := rex.GetProject(client, projectID)
+		project, err := rex.GetProject(RxConfig.AuthClient, projectID)
 
 		if c, _ := cmd.Flags().GetInt(paramDownload); c != -1 {
-			rex.DownloadFile(client, project.Embedded.ProjectFiles[c].Links.FileDownload.Href)
+			rex.DownloadFile(RxConfig.AuthClient, project.Embedded.ProjectFiles[c].Links.FileDownload.Href)
 		} else {
 			console(err, project)
 		}
@@ -92,14 +89,13 @@ var newCmd = &cobra.Command{
 	Use:   "new",
 	Short: "Create a new project",
 	Run: func(cmd *cobra.Command, args []string) {
-		client, err := rex.NewClient(RxConfig.ClientID, RxConfig.ClientSecret, nil)
 		name, _ := cmd.Flags().GetString(paramName)
 		fileList, _ := cmd.Flags().GetString(paramFile)
 
 		if files := getFileEntries(fileList); len(files) > 0 {
 			for _, f := range files {
 				fmt.Print("Creating project ", f, " ... ")
-				err = rex.CreateProject(client, f)
+				err := rex.CreateProject(RxConfig.AuthClient, f)
 				console(err, "Success!")
 			}
 		} else if name == "" {
@@ -108,11 +104,11 @@ var newCmd = &cobra.Command{
 			name, _ = reader.ReadString('\n')
 			name = strings.Replace(name, "\n", "", -1)
 			fmt.Print("Creating new project: ", name)
-			err = rex.CreateProject(client, name)
+			err := rex.CreateProject(RxConfig.AuthClient, name)
 			console(err, "Success!")
 		} else {
 			fmt.Print("Creating new project: ", name)
-			err = rex.CreateProject(client, name)
+			err := rex.CreateProject(RxConfig.AuthClient, name)
 			console(err, "Success!")
 		}
 	},
@@ -122,7 +118,6 @@ var uploadFileCmd = &cobra.Command{
 	Use:   "upload",
 	Short: "Uploads a new file for a given project",
 	Run: func(cmd *cobra.Command, args []string) {
-		client, err := rex.NewClient(RxConfig.ClientID, RxConfig.ClientSecret, nil)
 		projectID, _ := cmd.Flags().GetString(paramProjectID)
 		localFile, _ := cmd.Flags().GetString(paramLocalFile)
 		name := filepath.Base(localFile)
@@ -138,13 +133,13 @@ var uploadFileCmd = &cobra.Command{
 				fmt.Print("Uploading file ", f, " ... ")
 				r, _ := os.Open(f)
 				defer r.Close()
-				err = rex.UploadProjectFile(client, projectID, filepath.Base(f), f, r)
+				err := rex.UploadProjectFile(RxConfig.AuthClient, projectID, filepath.Base(f), f, r)
 				console(err, "Success!")
 			}
 		} else {
 			r, _ := os.Open(localFile)
 			defer r.Close()
-			err = rex.UploadProjectFile(client, projectID, name, localFile, r)
+			err := rex.UploadProjectFile(RxConfig.AuthClient, projectID, name, localFile, r)
 			console(err, "Success!")
 		}
 	},
