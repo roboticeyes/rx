@@ -131,14 +131,11 @@ var uploadFileCmd = &cobra.Command{
 				fmt.Print("Uploading file ", f, " ... ")
 				r, _ := os.Open(f)
 				defer r.Close()
-				err := rex.UploadProjectFile(RxConfig.Client, projectID, filepath.Base(f), f, r)
+				err := rex.UploadProjectFile(RxConfig.Client, projectID, filepath.Base(f), f, nil, r)
 				console(err, "Success!")
 			}
 		} else {
-			r, _ := os.Open(localFile)
-			defer r.Close()
-			err := rex.UploadProjectFile(RxConfig.Client, projectID, name, localFile, r)
-			console(err, "Success!")
+			uploadProjectFileInteractive(projectID, name, localFile)
 		}
 	},
 }
@@ -181,6 +178,32 @@ func interpretFloatInput(input string, val float64) float64 {
 		return l
 	}
 	return val
+}
+
+func uploadProjectFileInteractive(projectID, name, localFile string) {
+	fr, _ := os.Open(localFile)
+	defer fr.Close()
+
+	r := bufio.NewReader(os.Stdin)
+	ft := rex.FileTransformation{}
+	ft.Position.Coordinates = make([]float64, 3)
+
+	v := getInput("Pos X [m]: ", r)
+	ft.Position.Coordinates[0] = interpretFloatInput(v, 0.0)
+	v = getInput("Pos Y [m]: ", r)
+	ft.Position.Coordinates[1] = interpretFloatInput(v, 0.0)
+	v = getInput("Pos Z [m]: ", r)
+	ft.Position.Coordinates[2] = interpretFloatInput(v, 0.0)
+	v = getInput("Rot X [degrees]: ", r)
+	ft.Rotation.X = interpretFloatInput(v, 0.0)
+	v = getInput("Rot Y [degrees]: ", r)
+	ft.Rotation.Y = interpretFloatInput(v, 0.0)
+	v = getInput("Rot Z [degrees]: ", r)
+	ft.Rotation.Z = interpretFloatInput(v, 0.0)
+	v = getInput("Scale [default=1]: ", r)
+	ft.Scale = interpretFloatInput(v, 1.0)
+	err := rex.UploadProjectFile(RxConfig.Client, projectID, name, localFile, &ft, fr)
+	console(err, "Success!")
 }
 
 func createProjectInteractive() {
