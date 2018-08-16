@@ -13,3 +13,5 @@
 *.swp
 
 data/*
+/token
+/rx

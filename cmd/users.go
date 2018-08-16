@@ -34,15 +34,15 @@ REX user is the identity management console.
 
 		if c, _ := cmd.Flags().GetBool(paramCurrentUser); c == true {
 
-			console(nil, RxConfig.AuthClient.User)
+			console(nil, RxConfig.Client.User)
 
 		} else if c, _ := cmd.Flags().GetBool(paramCount); c == true {
-			count, err := rex.GetTotalNumberOfUsers(RxConfig.AuthClient)
+			count, err := rex.GetTotalNumberOfUsers(RxConfig.Client)
 			console(err, fmt.Sprintf("Found %d registered users.\n", count))
 
 		} else if email, _ := cmd.Flags().GetString(paramFindUser); email != "" {
 
-			user, err := rex.GetUserByEmail(RxConfig.AuthClient, email)
+			user, err := rex.GetUserByEmail(RxConfig.Client, email)
 			console(err, user)
 
 		} else {

@@ -50,7 +50,7 @@ var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List your projects",
 	Run: func(cmd *cobra.Command, args []string) {
-		project, err := rex.GetProjects(RxConfig.AuthClient)
+		project, err := rex.GetProjects(RxConfig.Client, RxConfig.Client.User.UserID)
 		console(err, project)
 	},
 }
@@ -60,10 +60,10 @@ var showCmd = &cobra.Command{
 	Short: "Show the details of a project",
 	Run: func(cmd *cobra.Command, args []string) {
 		projectID, _ := cmd.Flags().GetString(paramProjectID)
-		project, err := rex.GetProject(RxConfig.AuthClient, projectID)
+		project, err := rex.GetProject(RxConfig.Client, projectID)
 
 		if c, _ := cmd.Flags().GetInt(paramDownload); c != -1 {
-			rex.DownloadFile(RxConfig.AuthClient, project.Embedded.ProjectFiles[c].Links.FileDownload.Href)
+			rex.DownloadFile(RxConfig.Client, project.Embedded.ProjectFiles[c].Links.FileDownload.Href)
 		} else {
 			console(err, project)
 		}
@@ -99,14 +99,14 @@ var newCmd = &cobra.Command{
 		if files := getFileEntries(fileList); len(files) > 0 {
 			for _, f := range files {
 				fmt.Print("Creating project ", f, " ... ")
-				err := rex.CreateProject(RxConfig.AuthClient, f, nil, nil)
+				err := rex.CreateProject(RxConfig.Client, RxConfig.Client.User.UserID, f, nil, nil)
 				console(err, "Success!")
 			}
 		} else if name == "" {
 			createProjectInteractive()
 		} else {
 			fmt.Print("Creating new project: ", name)
-			err := rex.CreateProject(RxConfig.AuthClient, name, nil, nil)
+			err := rex.CreateProject(RxConfig.Client, RxConfig.Client.User.UserID, name, nil, nil)
 			console(err, "Success!")
 		}
 	},
@@ -131,13 +131,13 @@ var uploadFileCmd = &cobra.Command{
 				fmt.Print("Uploading file ", f, " ... ")
 				r, _ := os.Open(f)
 				defer r.Close()
-				err := rex.UploadProjectFile(RxConfig.AuthClient, projectID, filepath.Base(f), f, r)
+				err := rex.UploadProjectFile(RxConfig.Client, projectID, filepath.Base(f), f, r)
 				console(err, "Success!")
 			}
 		} else {
 			r, _ := os.Open(localFile)
 			defer r.Close()
-			err := rex.UploadProjectFile(RxConfig.AuthClient, projectID, name, localFile, r)
+			err := rex.UploadProjectFile(RxConfig.Client, projectID, name, localFile, r)
 			console(err, "Success!")
 		}
 	},
@@ -219,7 +219,7 @@ func createProjectInteractive() {
 	absoluteTransformation.Rotation.Z = interpretFloatInput(northingInput, 0.0)
 
 	fmt.Printf("\n\nProject %s ", name)
-	err := rex.CreateProject(RxConfig.AuthClient, name, &address, &absoluteTransformation)
+	err := rex.CreateProject(RxConfig.Client, RxConfig.Client.User.UserID, name, &address, &absoluteTransformation)
 	console(err, "added successfully!")
 
 	mapLink := openStreetMap
