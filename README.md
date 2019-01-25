@@ -1,7 +1,8 @@
 # rx - CLI for REX
-[![Build Status](https://travis-ci.org/breiting/rx.svg?branch=master)](https://travis-ci.org/breiting/rx)
+[![Build Status](https://travis-ci.org/roboticeyes/rx.svg?branch=master)](https://travis-ci.org/roboticeyes/rx)
 
-**rx** is a command line tool for accessing the REX cloud API. rx is using the [rex](https://github.com/breiting/rex) GO library.
+**rx** is a command line tool for accessing the REX cloud API. rx is using the
+[gorex](https://github.com/roboticeyes/gorex) GO library.
 
 Make sure that you have a valid API key which can be retrieved from https://rex.robotic-eyes.com.
 
@@ -14,11 +15,10 @@ go build
 ./rx
 ```
 
-You can also download a pre-compiled version of `rx` from [here](https://github.com/breiting/rx/releases).
-
 ## Setup your config file
 
-You need to create a configuration file in order to run `rx` properly. Create a new file (e.g. `rx.yml`) and add the following information:
+You need to create a configuration file in order to run `rx` properly. Create a new file (e.g. `rx.yml`) and add the
+following information:
 
 ```
 BaseURL: "https://rex.robotic-eyes.com"
@@ -44,19 +44,21 @@ You can create a new project using the interactive shell:
 ./rx --config rx.yml projects new
 ```
 
-The program will ask you several questions and stores the project in the REX cloud. Here is an example output of the interactive session. Please notice, that I am using OpenStreetMap for getting the geo-location (see license notice below). Based on the given address, OpenStreetMap may already propose a proper LAT/LON information.
+The program will ask you several questions and stores the project in the REX cloud. Here is an example output of the
+interactive session. Please notice, that I am using OpenStreetMap for getting the geo-location (see license notice
+below). Based on the given address, OpenStreetMap may already propose a proper LAT/LON information.
 
 Once the project is created, `rx` offers a link on the map, again using OpenStreetMap.
 
 ```
 Name                : My first project
 AddressLine1        : Stremayrgasse 16
-AddressLine2        : 
-AddressLine3        : 
-AddressLine4        : 
+AddressLine2        :
+AddressLine3        :
+AddressLine4        :
 Postcode            : 8010
 City                : Graz
-Region              : 
+Region              :
 Country             : AT
 OpenStreetMap data
 
@@ -65,8 +67,8 @@ Geolocation name:  Technische Universität Graz, 16, Stremayrgasse, Schönau, Ja
 Geolocation lat:   47.0650332
 Geolocation lon:   15.4522326353324
 
-Lat [47.065033]     : 
-Lon [15.452233]     : 
+Lat [47.065033]     :
+Lon [15.452233]     :
 Height [m]          : 350
 Northing (0=north, 90=east): 0
 
