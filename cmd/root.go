@@ -1,8 +1,3 @@
-/*
- * Author: Bernhard Reitinger
- * Date  : 2018
- */
-
 package cmd
 
 import (
@@ -34,11 +29,7 @@ var RxConfig = struct {
 var rootCmd = &cobra.Command{
 	Use:   "rx",
 	Short: "REX command line tool for accessing the REX cloud API",
-	Long: `
---------------------------------------------------------------
-                          rx - (c) 2018
---------------------------------------------------------------
-
+	Long: getCmdLineHeader() + `
 rx is a command line tool for accessing the REX cloud API.
 For further information please see our support page:
 

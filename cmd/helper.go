@@ -1,8 +1,3 @@
-/*
- * Author: Bernhard Reitinger
- * Date  : 2018
- */
-
 package cmd
 
 import (

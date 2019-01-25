@@ -1,4 +1,4 @@
-// Copyright © 2018 Bernhard Reitinger <br@reecon.at>
+// Copyright © 2019 Robotic Eyes GmbH
 package main
 
 import "github.com/roboticeyes/rx/cmd"

@@ -1,8 +1,3 @@
-/*
- * Author: Bernhard Reitinger
- * Date  : 2018
- */
-
 package cmd
 
 import (
@@ -22,11 +17,7 @@ const (
 var usersCmd = &cobra.Command{
 	Use:   "users",
 	Short: "Work with REX users",
-	Long: `
---------------------------------------------------------------
-                          rx - (c) 2018
---------------------------------------------------------------
-
+	Long: getCmdLineHeader() + `
 REX user is the identity management console.
 
 `,

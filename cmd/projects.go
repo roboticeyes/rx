@@ -1,8 +1,3 @@
-/*
- * Author: Bernhard Reitinger
- * Date  : 2018
- */
-
 package cmd
 
 import (
@@ -33,11 +28,7 @@ const (
 var projectsCmd = &cobra.Command{
 	Use:   "projects",
 	Short: "Work with REX projects",
-	Long: `
---------------------------------------------------------------
-                          rx - (c) 2018
---------------------------------------------------------------
-
+	Long: getCmdLineHeader() + `
 REX projects are the main entity for organizing your data.
 
 `,
